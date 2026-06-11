@@ -1,0 +1,379 @@
+
+<style>
+  * { box-sizing: border-box; }
+  .biz-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; padding: 1rem 0; }
+  .biz-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.1rem; cursor: pointer; transition: border-color .2s; }
+  .biz-card:hover { border-color: var(--color-border-primary); }
+  .biz-card.active { border: 1.5px solid var(--color-border-info); }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .biz-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 2px; }
+  .biz-type { font-size: 11px; color: var(--color-text-secondary); }
+  .badge { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
+  .easy { background: #EAF3DE; color: #3B6D11; }
+  .intermediate { background: #FAEEDA; color: #633806; }
+  .hard { background: #FAECE7; color: #4A1B0C; }
+  .biz-meta { display: flex; gap: 8px; margin: 10px 0 8px; flex-wrap: wrap; }
+  .meta-pill { font-size: 11px; background: var(--color-background-secondary); color: var(--color-text-secondary); padding: 3px 8px; border-radius: 99px; }
+  .biz-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.55; margin: 0; }
+  .detail-panel { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem 1.2rem; margin: 0 0 1rem; border: 0.5px solid var(--color-border-tertiary); }
+  .detail-panel h3 { font-size: 15px; font-weight: 500; margin: 0 0 10px; color: var(--color-text-primary); }
+  .detail-row { display: flex; gap: 8px; margin-bottom: 7px; font-size: 13px; align-items: flex-start; }
+  .detail-label { color: var(--color-text-secondary); min-width: 110px; flex-shrink: 0; }
+  .detail-val { color: var(--color-text-primary); }
+  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .filter-btn { font-size: 12px; padding: 5px 14px; border-radius: 99px; border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-secondary); cursor: pointer; transition: background .15s; }
+  .filter-btn.active, .filter-btn:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+  .section-label { font-size: 12px; color: var(--color-text-secondary); font-weight: 500; margin: 0 0 8px; letter-spacing: .04em; text-transform: uppercase; }
+  .steps-list { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+  .steps-list li { counter-increment: s; display: flex; gap: 10px; margin-bottom: 7px; font-size: 13px; color: var(--color-text-primary); }
+  .steps-list li::before { content: counter(s); min-width: 20px; height: 20px; border-radius: 50%; background: var(--color-background-info); color: var(--color-text-info); font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .prompt-btn { font-size: 12px; padding: 6px 14px; border-radius: 99px; border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-secondary); cursor: pointer; margin-top: 10px; }
+  .prompt-btn:hover { background: var(--color-background-secondary); }
+</style>
+
+<h2 class="sr-only">Business opportunities guide for Dar es Salaam with difficulty levels, capital estimates, and startup steps</h2>
+
+<div class="section-label">Filter by difficulty</div>
+<div class="filter-bar">
+  <button class="filter-btn active" onclick="filterCards('all', this)">All businesses</button>
+  <button class="filter-btn" onclick="filterCards('easy', this)">Easy</button>
+  <button class="filter-btn" onclick="filterCards('intermediate', this)">Intermediate</button>
+  <button class="filter-btn" onclick="filterCards('hard', this)">Hard</button>
+</div>
+
+<div id="detail-area"></div>
+
+<div class="biz-grid" id="biz-grid"></div>
+
+<script>
+const businesses = [
+  {
+    id: 1,
+    name: "Mobile detailing / car wash",
+    type: "Your idea",
+    level: "easy",
+    capital: "TZS 500K – 1.5M",
+    timeline: "2–4 weeks to launch",
+    income: "TZS 800K–2M/month",
+    desc: "Go to clients — offices, estates, parking lots. Low overhead, no rent. Demand is constant in Dar's dusty, humid climate.",
+    steps: [
+      "Buy a pressure washer, foam cannon, microfibre cloths, wax, interior cleaner",
+      "Open a simple Instagram/Facebook page with before-after photos",
+      "Offer free first wash to 5 friends, collect testimonials",
+      "Partner with car parks, gated estates, offices for repeat clients",
+      "Use WhatsApp Business to take bookings"
+    ],
+    tips: "Weekend morning slots at residential estates are gold. Corporate fleets (NGOs, banks) give steady bulk contracts."
+  },
+  {
+    id: 2,
+    name: "Hair salon & products",
+    type: "Your idea",
+    level: "intermediate",
+    capital: "TZS 2M – 6M",
+    timeline: "4–8 weeks to launch",
+    income: "TZS 1.5M–4M/month",
+    desc: "Steady demand from women across all income levels. Products (wigs, extensions, treatments) sold alongside services multiply revenue.",
+    steps: [
+      "Rent a small room in a busy neighbourhood or shop-house (Kinondoni, Kariakoo area)",
+      "Buy 2–3 chairs, mirrors, dryers, basic tools",
+      "Stock fast-moving products: Brazilian/synthetic wigs, relaxers, oils",
+      "Post transformation videos on TikTok and Instagram",
+      "Offer loyalty cards — 10th visit free"
+    ],
+    tips: "Products alone can outsell services 2:1 if you stock what's trending. Watch YouTube for what Nigerian/Kenyan markets are buying."
+  },
+  {
+    id: 3,
+    name: "Ladies thrift store",
+    type: "Your idea",
+    level: "easy",
+    capital: "TZS 800K – 2M",
+    timeline: "1–3 weeks to launch",
+    income: "TZS 600K–1.8M/month",
+    desc: "Mitumba (secondhand clothes) culture is massive in Tanzania. Online-first (Instagram/TikTok) eliminates rent costs entirely.",
+    steps: [
+      "Source bales from Kariakoo or Manzese market",
+      "Sort, steam/iron best pieces for photography",
+      "Post daily on Instagram Reels and TikTok — show the unboxing",
+      "Take orders via WhatsApp, deliver via boda boda",
+      "Graduate to a small physical rack in a shared space"
+    ],
+    tips: "Niche down fast — 'office wear mitumba' or 'plus size' beats general thrift. Build an Instagram following before you invest in stock."
+  },
+  {
+    id: 4,
+    name: "Electronics resell",
+    type: "Your idea",
+    level: "intermediate",
+    capital: "TZS 2M – 8M",
+    timeline: "2–4 weeks to launch",
+    income: "TZS 1M–3M/month",
+    desc: "Buy phones, laptops, accessories from Nairobi/Dubai or locally and resell. High turnover when you know pricing and quality.",
+    steps: [
+      "Start with accessories (chargers, cases, earbuds) — lower risk, fast turnover",
+      "Learn to test used phones: battery health, IMEI check, screen quality",
+      "Source from Kariakoo Computer City or Nairobi suppliers",
+      "Sell on Jiji.co.tz, Facebook Marketplace, and WhatsApp groups",
+      "Build trust with warranty offers (7-day returns)"
+    ],
+    tips: "Avoid counterfeit accessories — they kill your reputation. Iphone accessories and Samsung A-series phones are fastest moving in Dar."
+  },
+  {
+    id: 5,
+    name: "Skin care products",
+    type: "Your idea",
+    level: "intermediate",
+    capital: "TZS 1.5M – 4M",
+    timeline: "3–6 weeks to launch",
+    income: "TZS 1M–3M/month",
+    desc: "Sell curated or private-label skin care. Demand for brightening, anti-hyperpigmentation, and natural products is booming.",
+    steps: [
+      "Research top 5–10 products women in Dar are searching for (glutathione, kojic acid, natural oils)",
+      "Source from reputable suppliers — Nairobi, Jumia wholesale, or Dubai",
+      "Brand with simple packaging and a consistent Instagram presence",
+      "Educate — skin care content on TikTok/Instagram drives trust and sales",
+      "Add WhatsApp Business catalog for easy ordering"
+    ],
+    tips: "Private labeling (your name on existing products) costs more upfront but multiplies perceived value. Start with ready-made brands, then rebrand once cash flow is stable."
+  },
+  {
+    id: 6,
+    name: "Motor vehicle resale",
+    type: "Your idea",
+    level: "hard",
+    capital: "TZS 15M – 50M+",
+    timeline: "1–3 months",
+    income: "TZS 500K–5M per unit",
+    desc: "Buy, refurbish, and resell used cars. High capital required but high profit per deal. Needs mechanical knowledge or a trusted mechanic.",
+    steps: [
+      "Identify your price range — start with TZS 8–15M units (Toyota Vitz, Fielder)",
+      "Build relationship with a trusted mechanic to inspect before purchase",
+      "Source from owner sales, Jiji.co.tz, or dealers going excess stock",
+      "Register properly — TRA clearance, SUMATRA inspection",
+      "Market on Jiji, Facebook, and via dealership parking spots in busy areas"
+    ],
+    tips: "One flipped car per month covering profit > many months of small business. The risk is buying a lemon — inspection is everything."
+  },
+  {
+    id: 7,
+    name: "Airbnb / short-term rental",
+    type: "Your idea",
+    level: "hard",
+    capital: "TZS 10M – 30M (furnishing + deposit)",
+    timeline: "1–2 months",
+    income: "TZS 2M–8M/month per unit",
+    desc: "Dar has strong expat, NGO, and business travel demand. A well-located, well-furnished apartment can outperform long-term rental 3:1.",
+    steps: [
+      "Identify a property in Masaki, Mikocheni, Oyster Bay, or near Julius Nyerere Road",
+      "Negotiate a sublease-to-Airbnb arrangement with landlord (requires transparency)",
+      "Furnish to a modern/clean standard — invest in photography",
+      "List on Airbnb + Booking.com + local expat Facebook groups",
+      "Hire a cleaner on a per-booking basis"
+    ],
+    tips: "If you don't own property, the sublease model works — but get it in writing. Self check-in (smart lock or lockbox) reduces management time."
+  },
+  {
+    id: 8,
+    name: "Liquor store / wines & spirits",
+    type: "Your idea",
+    level: "intermediate",
+    capital: "TZS 5M – 15M",
+    timeline: "1–3 months (licensing)",
+    income: "TZS 1.5M–5M/month",
+    desc: "Consistent demand especially near residential areas, events, and hotels. Licensing is required but manageable.",
+    steps: [
+      "Apply for Alcoholic Beverages Control and Regulatory Authority (ABCRA) licence",
+      "Secure a location — standalone or shop-house away from schools/churches (required by law)",
+      "Source from Tanzania Breweries, Serengeti, and spirits importers",
+      "Offer delivery via WhatsApp orders — major differentiator",
+      "Add event supply as a side service (weddings, parties)"
+    ],
+    tips: "Weekend and month-end sales drive 60–70% of revenue. Stock depth (having what others run out of) is your competitive edge."
+  },
+  {
+    id: 9,
+    name: "Food delivery / home chef",
+    type: "Additional idea",
+    level: "easy",
+    capital: "TZS 300K – 800K",
+    timeline: "1–2 weeks to launch",
+    income: "TZS 600K–2M/month",
+    desc: "Cook meals at home and sell via WhatsApp, Telegram groups, or partner with Yango Food / Uber Eats in Dar. Very low barrier to entry.",
+    steps: [
+      "Choose a niche: office lunch boxes, local dishes (pilau, biryani), healthy meals",
+      "Set up WhatsApp Business with a daily menu as your catalog",
+      "Join local community WhatsApp/Telegram groups to advertise",
+      "Use boda boda delivery for nearby orders",
+      "Register with Yango Food or Bolt Food for wider reach"
+    ],
+    tips: "Lunch box subscriptions (weekly/monthly prepay) give you predictable income and reduce food waste. Start with 10 subscribers before scaling."
+  },
+  {
+    id: 10,
+    name: "Printing & branding services",
+    type: "Additional idea",
+    level: "intermediate",
+    capital: "TZS 3M – 8M",
+    timeline: "3–6 weeks",
+    income: "TZS 1M–3.5M/month",
+    desc: "Businesses, schools, and event organisers constantly need branded merchandise — T-shirts, banners, ID cards, letterheads. High repeat clientele.",
+    steps: [
+      "Buy a heat press machine and start with T-shirt printing (TZS 2–3M for decent machine)",
+      "Add sublimation printer for mugs, caps, lanyards",
+      "Register as a business to serve tenders (govt schools, NGOs)",
+      "Market to schools, churches, and corporates during event seasons",
+      "Upsell — design service + printing together"
+    ],
+    tips: "Corporate and NGO bulk orders are the real money. One 200-shirt order for a conference can pay your monthly expenses."
+  },
+  {
+    id: 11,
+    name: "Event photography & videography",
+    type: "Additional idea",
+    level: "easy",
+    capital: "TZS 1M – 4M (gear)",
+    timeline: "2–4 weeks",
+    income: "TZS 800K–3M/month",
+    desc: "Dar has constant weddings, graduations, corporate events, and brand activations. Strong visual social media presence is both your portfolio and your marketing.",
+    steps: [
+      "Invest in one decent camera (used Canon/Sony mirrorless, TZS 1.5–3M)",
+      "Shoot free events for 3–4 friends to build a portfolio",
+      "Post consistently on Instagram and TikTok — video reels travel far",
+      "Join wedding and events Facebook groups in Dar",
+      "Offer packages: photos only / photos + same-day highlight video"
+    ],
+    tips: "Corporate events (product launches, company dinners) pay 2–3× what weddings pay, with less weekend stress."
+  },
+  {
+    id: 12,
+    name: "Cleaning services (residential & commercial)",
+    type: "Additional idea",
+    level: "easy",
+    capital: "TZS 400K – 1.2M",
+    timeline: "1–2 weeks",
+    income: "TZS 700K–2.5M/month",
+    desc: "Reliable home and office cleaning is in high demand among Dar's growing professional class and Airbnb hosts. Highly repeatable revenue.",
+    steps: [
+      "Buy basic equipment: mop, vacuum, cleaning chemicals, aprons, gloves",
+      "Start with personal network — offer discounted first clean",
+      "Target Airbnb hosts for guaranteed repeat business after each checkout",
+      "Build a team of 2–3 cleaners as you grow",
+      "Market on expat groups (Dar es Salaam Expats on Facebook)"
+    ],
+    tips: "Airbnb hosts are your highest-value clients — they need reliable, fast turnaround every few days. One contract with a busy host = stable income."
+  },
+  {
+    id: 13,
+    name: "Tutoring & coaching (online or in-person)",
+    type: "Additional idea",
+    level: "easy",
+    capital: "TZS 100K – 400K",
+    timeline: "1 week to launch",
+    income: "TZS 500K–2M/month",
+    desc: "Tutor secondary school students in science, maths, or English. Or pivot to adult skills: English, Excel, digital skills, coding basics.",
+    steps: [
+      "Define your subject — stick to what you know deeply",
+      "Start with 3–5 students via word of mouth in your neighbourhood",
+      "Move online with Zoom/Google Meet to reach students beyond your area",
+      "Sell recorded lessons as passive income products",
+      "Partner with schools for after-school enrichment contracts"
+    ],
+    tips: "Form Four exam prep (NECTA) is high demand and high payment — parents pay well for reliable results."
+  },
+  {
+    id: 14,
+    name: "Freelance digital services",
+    type: "Additional idea",
+    level: "intermediate",
+    capital: "TZS 200K – 600K",
+    timeline: "2–4 weeks (skill building)",
+    income: "TZS 800K–5M+/month",
+    desc: "Offer social media management, graphic design, copywriting, or automation (n8n, Make.com) to local businesses or globally via Upwork/Fiverr.",
+    steps: [
+      "Choose one service — social media management is fastest to sell locally",
+      "Build 2–3 sample projects as your portfolio",
+      "Pitch to local SMEs on Instagram and LinkedIn — most have zero digital strategy",
+      "List on Upwork or Fiverr for international clients (USD income)",
+      "Raise rates after first 5 paying clients"
+    ],
+    tips: "AI automation (WhatsApp bots, workflow automation) is a first-mover opportunity in Dar right now — very few people are selling it to local businesses."
+  },
+  {
+    id: 15,
+    name: "Fuel & commodities distribution",
+    type: "Additional idea",
+    level: "hard",
+    capital: "TZS 20M – 100M+",
+    timeline: "2–4 months",
+    income: "High but variable",
+    desc: "Supply fuel, rice, flour, or other commodities to institutions (schools, construction sites, factories). Requires capital, licenses, and strong networks.",
+    steps: [
+      "Identify your commodity — fuel is most consistent, rice/flour more seasonal",
+      "Register a company and get relevant TRA/EWURA (for fuel) licenses",
+      "Secure supplier relationships (PUMA, Total, Oryx for fuel)",
+      "Target tenders from government schools, NGOs, construction companies",
+      "Start small — supply 1–2 clients before scaling fleet/storage"
+    ],
+    tips: "One construction site fuel contract can generate TZS 5–15M/month. The hard part is access — relationships and a clean company profile matter more than anything."
+  }
+];
+
+let currentFilter = 'all';
+let activeId = null;
+
+function filterCards(level, btn) {
+  currentFilter = level;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCards();
+  document.getElementById('detail-area').innerHTML = '';
+  activeId = null;
+}
+
+function renderCards() {
+  const grid = document.getElementById('biz-grid');
+  const filtered = currentFilter === 'all' ? businesses : businesses.filter(b => b.level === currentFilter);
+  grid.innerHTML = filtered.map(b => `
+    <div class="biz-card${activeId === b.id ? ' active' : ''}" id="card-${b.id}" onclick="showDetail(${b.id})">
+      <div class="card-top">
+        <div>
+          <p class="biz-name">${b.name}</p>
+          <span class="biz-type">${b.type}</span>
+        </div>
+        <span class="badge ${b.level}">${b.level.charAt(0).toUpperCase()+b.level.slice(1)}</span>
+      </div>
+      <div class="biz-meta">
+        <span class="meta-pill">Capital: ${b.capital}</span>
+        <span class="meta-pill">${b.income}</span>
+      </div>
+      <p class="biz-desc">${b.desc}</p>
+    </div>
+  `).join('');
+}
+
+function showDetail(id) {
+  const b = businesses.find(x => x.id === id);
+  activeId = id;
+  renderCards();
+  const area = document.getElementById('detail-area');
+  area.innerHTML = `
+    <div class="detail-panel">
+      <h3>${b.name} — how to start in Dar es Salaam</h3>
+      <div class="detail-row"><span class="detail-label">Difficulty</span><span class="detail-val"><span class="badge ${b.level}" style="font-size:12px">${b.level.charAt(0).toUpperCase()+b.level.slice(1)}</span></span></div>
+      <div class="detail-row"><span class="detail-label">Starting capital</span><span class="detail-val">${b.capital}</span></div>
+      <div class="detail-row"><span class="detail-label">Time to launch</span><span class="detail-val">${b.timeline}</span></div>
+      <div class="detail-row"><span class="detail-label">Income potential</span><span class="detail-val">${b.income}</span></div>
+      <div class="detail-row" style="margin-top:10px"><span class="detail-label" style="font-weight:500">Dar-specific tip</span><span class="detail-val" style="font-style:italic">${b.tips}</span></div>
+      <div style="margin-top:14px">
+        <div class="section-label">Steps to start</div>
+        <ol class="steps-list">${b.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
+      </div>
+      <button class="prompt-btn" onclick="sendPrompt('Give me a full launch plan for ${b.name} in Dar es Salaam, including where to source, how to market, and realistic month 1–6 projections')">Get full launch plan ↗</button>
+    </div>
+  `;
+  area.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+renderCards();
+</script>
